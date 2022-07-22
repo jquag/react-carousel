@@ -1,0 +1,33 @@
+.Container {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+}
+
+.Container button {
+  z-index: 2;
+}
+
+.Carousel {
+  position: relative;
+  height: 100%;
+  /* overflow-x: hidden; */
+}
+
+.Items {
+  display: flex;
+  position: relative;
+  white-space: nowrap;
+  width: 100%;
+  top: 0;
+  transition: left 400ms;
+}
+
+.Items.NoTransition {
+  transition: unset;
+}
+
+.Item {
+  flex-shrink: 0;
+  width: 100%;
+}
