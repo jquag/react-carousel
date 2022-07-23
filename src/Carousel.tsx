@@ -1,15 +1,15 @@
-import { Children, ReactNode, useCallback, useState } from "react";
+import { Children, ReactNode, useCallback, useEffect, useState } from "react";
 import classes from './Carousel.module.css';
 
 interface Props {
-  children: ReactNode[],
+  children: ReactNode[] | ReactNode,
 }
 
 function Carousel({children}: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [useTransitions, setUseTransition] = useState(true);
 
-  const [visibleItems, setVisibleItems] = useState(Children.toArray(children));
+  const [visibleItems, setVisibleItems] = useState([] as ReactNode[]);
 
   const handleNext = useCallback(() => {
     const length = Children.count(children);
@@ -22,7 +22,7 @@ function Carousel({children}: Props) {
         setActiveIndex(0);
         setTimeout(() => {
           setUseTransition(true);
-        }, 40);
+        }, 50);
       }, 400)
     } else {
       setActiveIndex(activeIndex + 1);
@@ -39,24 +39,39 @@ function Carousel({children}: Props) {
         setActiveIndex(Children.count(children) - 1);
         setTimeout(() => {
           setVisibleItems([...Children.toArray(children)]);
-        }, 400);
+        }, 200);
       }, 50)
     } else {
       setActiveIndex(activeIndex - 1);
     }
-  }, [activeIndex, children]);
+  }, [activeIndex]);
+
+  const left = -100 * Math.min(activeIndex, (visibleItems.length - 1));
+
+  useEffect(() => {
+    setVisibleItems(Children.toArray(children));
+  }, [children]);
 
   return (
-    <div className={classes.Container}>
-      <button onClick={handlePrev}>prev</button>
+    <div>
       <div className={classes.Carousel}>
-        <div className={`${classes.Items} ${useTransitions ? '' : classes.NoTransition}`} style={{left: `${(-100 * activeIndex)}%`}}>
-          {visibleItems.map((item, i) => (
-            <div className={classes.Item} key={i}>{item}</div>
-          ))}
+        <button onClick={handlePrev}>{'<'}</button>
+        <div className={classes.ViewPort}>
+          <div className={`${classes.Slides} ${useTransitions ? '' : classes.NoTransition}`} style={{left: `${left}%`}}>
+            {visibleItems.map((item, i) => (
+              <div className={classes.Slide} key={i}>{item}</div>
+            ))}
+          </div>
         </div>
+        <button onClick={handleNext}>{'>'}</button>
       </div>
-      <button onClick={handleNext}>next</button>
+      <div className={classes.Pages}>
+        {Children.map(children, (_c, i) => (
+          <div className={`${classes.Page} ${activeIndex === i ? classes.active : ''}`} key={i}>
+            <button onClick={() => setActiveIndex(i)}/>
+          </div>
+        ))}
+      </div>
     </div>
   )
 
